@@ -12,44 +12,135 @@
     <link href="icon.png" rel="icon">
     <title>Minp - Générateur de mots de passe</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/phosphor-icons"></script>
 </head>
-<body>
-    <div class="logo-container">
-        <img src="logo_minp.png" alt="Logo de Minp Générateur de Mots de Passe" id="logo">
+<body class="light-mode">
+    <div class="theme-toggle-container">
+        <button id="theme-toggle" aria-label="Changer de thème">
+            <i class="ph-sun"></i>
+            <i class="ph-moon"></i>
+        </button>
     </div>
-    <div class="container">
-        <h1>Générateur de mots de passe</h1>
-        <div style="display: flex; align-items: center; justify-content: center;">
+    
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="logo-container">
+                <img src="logo_minp.png" alt="Logo de Minp Générateur de Mots de Passe" id="logo">
+            </div>
+            <div class="sidebar-info">
+                <h3>À propos de Minp</h3>
+                <p>Minp est un générateur de mots de passe sécurisé qui vous permet de créer des mots de passe robustes avec différentes options de personnalisation.</p>
+                <div class="separator"></div>
+                <h3>Options</h3>
+                <div class="options">
+                    <div class="option-group">
+                        <label for="length" class="slider-label">
+                            <span>Longueur: <span id="length-value">16</span></span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="length" min="4" max="64" value="16" class="slider">
+                        </div>
+                    </div>
+
+                    <div class="option-item">
+                        <label class="switch-label">
+                            <span>Majuscules</span>
+                            <div class="switch">
+                                <input type="checkbox" id="uppercase">
+                                <span class="switch-slider"></span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="option-item">
+                        <label class="switch-label">
+                            <span>Caractères spéciaux</span>
+                            <div class="switch">
+                                <input type="checkbox" id="specialChars">
+                                <span class="switch-slider"></span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="option-item">
+                        <label class="switch-label">
+                            <span>Chiffres</span>
+                            <div class="switch">
+                                <input type="checkbox" id="numbers" checked>
+                                <span class="switch-slider"></span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="option-item">
+                        <label class="switch-label">
+                            <span>Lettres</span>
+                            <div class="switch">
+                                <input type="checkbox" id="letters" checked>
+                                <span class="switch-slider"></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <p>© <span id="year"></span> Association Make In Lab</p>
+            </div>
         </div>
-        <div class="options">
-            <label for="length">Longueur:</label>
-            <input type="number" id="length" min="1" max="32" value="16">
 
-            <label>
-                <input type="checkbox" id="uppercase"> Avec majuscules
-            </label>
+        <main class="content">
+            <div class="header">
+                <h1>Générateur de mots de passe</h1>
+                <p class="subtitle">Créez des mots de passe sécurisés et personnalisés</p>
+            </div>
 
-            <label>
-                <input type="checkbox" id="specialChars"> Avec caractères spéciaux
-            </label>
+            <div class="password-card">
+                <div class="password-container">
+                    <input type="text" id="password" readonly placeholder="Votre mot de passe apparaîtra ici">
+                    <div class="password-actions">
+                        <button id="copy-btn" class="icon-btn" aria-label="Copier le mot de passe">
+                            <i class="ph-copy"></i>
+                        </button>
+                        <button id="refresh-btn" class="icon-btn" aria-label="Générer un nouveau mot de passe">
+                            <i class="ph-arrows-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
 
-            <label>
-                <input type="checkbox" id="numbers" checked> Avec chiffres
-            </label>
+                <div class="password-strength" id="password-strength">
+                    <div class="strength-meter">
+                        <div class="strength-segment"></div>
+                        <div class="strength-segment"></div>
+                        <div class="strength-segment"></div>
+                        <div class="strength-segment"></div>
+                    </div>
+                    <span class="strength-text">Force: <span id="strength-value">Indéterminée</span></span>
+                </div>
 
-            <label>
-                <input type="checkbox" id="letters" checked> Avec lettres
-            </label>
-        </div>
-        <div class="password-container">
-            <input type="text" id="password" readonly>
-            <button id="copy-btn" onclick="copyPassword()">Copier</button>
-        </div>
-        <button onclick="generatePassword()">Générer</button>
+                <button id="generate-btn" class="primary-btn">
+                    Générer un mot de passe
+                </button>
+            </div>
+
+            <div class="tips-section">
+                <h3>Conseils pour un mot de passe sûr</h3>
+                <ul>
+                    <li>Utilisez un minimum de 12 caractères</li>
+                    <li>Combinez lettres, chiffres et caractères spéciaux</li>
+                    <li>Évitez les informations personnelles facilement devinables</li>
+                    <li>Utilisez un mot de passe unique pour chaque compte</li>
+                </ul>
+            </div>
+        </main>
     </div>
-    <footer>
-        <p>© <span id="year"></span> Association Make In Lab. Tous droits réservés.</p>
-    </footer>
+
+    <div class="toast" id="toast">
+        <div class="toast-icon">
+            <i class="ph-check"></i>
+        </div>
+        <div class="toast-message">Mot de passe copié!</div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
