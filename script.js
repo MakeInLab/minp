@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const generateBtn = document.getElementById('generate-btn');
     const copyBtn = document.getElementById('copy-btn');
     const refreshBtn = document.getElementById('refresh-btn');
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+    const sidebar = document.querySelector('.sidebar');
+    const menuOverlay = document.getElementById('menu-overlay');
     
     if (typeof PhosphorIcons !== 'undefined') {
         PhosphorIcons.replace();
@@ -65,13 +69,66 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    const logoContainer = document.querySelector('.logo-container');
-    const sidebar = document.querySelector('.sidebar');
-    
-    if (logoContainer && sidebar && window.innerWidth <= 768) {
-        logoContainer.addEventListener('click', function() {
-            sidebar.classList.toggle('expanded');
+    if (mobileMenuToggle && sidebar) {
+        mobileMenuToggle.addEventListener('click', function() {
+            toggleSidebar();
         });
+        
+        if (closeSidebarBtn) {
+            closeSidebarBtn.addEventListener('click', function() {
+                if (sidebar.classList.contains('expanded')) {
+                    toggleSidebar();
+                }
+            });
+        }
+        
+        if (menuOverlay) {
+            menuOverlay.addEventListener('click', function() {
+                if (sidebar.classList.contains('expanded')) {
+                    toggleSidebar();
+                }
+            });
+        }
+        
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', function(event) {
+            touchStartX = event.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        document.addEventListener('touchend', function(event) {
+            touchEndX = event.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+        
+        function handleSwipe() {
+            const swipeDistance = touchEndX - touchStartX;
+            const threshold = 70;
+            
+            if (swipeDistance > threshold && !sidebar.classList.contains('expanded')) {
+                toggleSidebar();
+            } else if (swipeDistance < -threshold && sidebar.classList.contains('expanded')) {
+                toggleSidebar();
+            }
+        }
+    }
+    
+    function toggleSidebar() {
+        sidebar.classList.toggle('expanded');
+        document.body.classList.toggle('menu-open');
+        
+        if (menuOverlay) {
+            menuOverlay.classList.toggle('active');
+        }
+        
+        if (sidebar.classList.contains('expanded')) {
+            const elements = sidebar.querySelectorAll('.sidebar-info h3, .sidebar-info p, .option-item, .sidebar-footer');
+            elements.forEach(function(el) {
+                el.style.opacity = "0";
+                el.offsetHeight;
+            });
+        }
     }
     
     const yearElement = document.getElementById("year");
@@ -80,8 +137,47 @@ document.addEventListener('DOMContentLoaded', function() {
         yearElement.textContent = currentYear;
     }
     
+    if (passwordField) {
+        passwordField.addEventListener('focus', function() {
+            setTimeout(function() {
+                passwordField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        });
+    }
+    
     generatePassword();
+    
+    enableTouchInteractions();
 });
+
+function enableTouchInteractions() {
+    const smallButtons = document.querySelectorAll('.icon-btn, #theme-toggle, .mobile-menu-toggle');
+    
+    smallButtons.forEach(function(button) {
+        button.addEventListener('touchstart', function(e) {
+            e.target.closest('button, .mobile-menu-toggle').classList.add('touch-active');
+        }, { passive: true });
+        
+        button.addEventListener('touchend', function(e) {
+            setTimeout(function() {
+                const element = e.target.closest('button, .mobile-menu-toggle');
+                if (element) {
+                    element.classList.remove('touch-active');
+                }
+            }, 150);
+        }, { passive: true });
+    });
+    
+    const noZoomElements = document.querySelectorAll('.password-container, .slider, .switch-label');
+    
+    noZoomElements.forEach(function(element) {
+        element.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    });
+}
 
 function generatePassword() {
     const lengthElement = document.getElementById('length');

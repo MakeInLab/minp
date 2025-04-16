@@ -15,13 +15,6 @@
     <script src="https://unpkg.com/phosphor-icons"></script>
 </head>
 <body class="light-mode">
-    <div class="theme-toggle-container">
-        <button id="theme-toggle" aria-label="Changer de thème">
-            <i class="ph-sun"></i>
-            <i class="ph-moon"></i>
-        </button>
-    </div>
-    
     <div class="app-container">
         <div class="sidebar">
             <div class="logo-container">
@@ -86,6 +79,32 @@
             <div class="sidebar-footer">
                 <p>© <span id="year"></span> Association Make In Lab</p>
             </div>
+        </div>
+
+        <div class="mobile-header">
+            <div class="mobile-header-left">
+                <img src="logo_minp.png" alt="Logo de Minp" class="mobile-logo">
+            </div>
+            <div class="mobile-header-right">
+                <div class="theme-toggle-container">
+                    <button id="theme-toggle" aria-label="Changer de thème">
+                        <i class="ph-sun"></i>
+                        <i class="ph-moon"></i>
+                    </button>
+                </div>
+                <div class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Menu mobile">
+                    <span class="menu-bar"></span>
+                    <span class="menu-bar"></span>
+                    <span class="menu-bar"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-overlay" id="menu-overlay"></div>
+        
+        <div class="close-sidebar-btn" id="close-sidebar-btn">
+            <span></span>
+            <span></span>
         </div>
 
         <main class="content">

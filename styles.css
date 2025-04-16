@@ -50,6 +50,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -60,6 +61,7 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
     overflow-x: hidden;
     min-height: 100vh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 .app-container {
@@ -142,6 +144,10 @@ body {
     max-width: calc(100% - 280px);
     height: 100%;
     overflow-y: auto;
+}
+
+.mobile-header, .menu-overlay {
+    display: none;
 }
 
 .header {
@@ -506,6 +512,73 @@ input:checked + .switch-slider:before {
     font-weight: 500;
 }
 
+@keyframes ripple {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.sidebar-content-visible .sidebar-info,
+.sidebar-content-visible .sidebar-footer {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.touch-active {
+    background-color: var(--border-color) !important;
+    transform: scale(0.95);
+}
+
+#sidebar-status {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.close-sidebar-btn {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--accent-primary);
+    z-index: 200;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.close-sidebar-btn:hover {
+    background-color: var(--accent-hover);
+}
+
+.close-sidebar-btn span {
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background-color: white;
+    border-radius: 2px;
+}
+
+.close-sidebar-btn span:first-child {
+    transform: rotate(45deg);
+}
+
+.close-sidebar-btn span:last-child {
+    transform: rotate(-45deg);
+}
+
+body.menu-open .close-sidebar-btn {
+    display: flex;
+}
+
 @media (max-width: 900px) {
     .sidebar {
         width: 240px;
@@ -516,53 +589,229 @@ input:checked + .switch-slider:before {
         max-width: calc(100% - 240px);
         padding: 30px;
     }
+    
+    .theme-toggle-container {
+        top: 15px;
+        right: 15px;
+    }
 }
 
 @media (max-width: 768px) {
     .app-container {
         flex-direction: column;
+        height: auto;
+        min-height: 100vh;
     }
     
     .sidebar {
         width: 100%;
-        position: relative;
-        height: auto;
+        position: fixed;
+        height: 100%;
         border-right: none;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        will-change: transform;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sidebar.expanded {
+        transform: translateX(0);
+        overflow-y: auto;
+    }
+    
+    .mobile-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background-color: var(--bg-primary);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 15px;
         border-bottom: 1px solid var(--border-color);
-        padding-bottom: 0;
+        z-index: 50;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    
+    .mobile-header-left {
+        display: flex;
+        align-items: center;
+    }
+    
+    .mobile-header-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .logo-container {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    #logo, .mobile-logo {
+        max-width: 120px;
+        height: auto;
+    }
+    
+    .mobile-menu-toggle {
+        width: 40px;
+        height: 40px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border-radius: 50%;
+        background-color: transparent;
+        transition: all 0.3s ease;
+        z-index: 200;
+    }
+    
+    body.menu-open .mobile-menu-toggle {
+        position: fixed;
+        top: 10px;
+        left: 15px;
+        background-color: var(--accent-primary);
+    }
+    
+    .menu-bar {
+        position: absolute;
+        width: 20px;
+        height: 2px;
+        background-color: var(--text-primary);
+        border-radius: 2px;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        transform-origin: center;
+    }
+    
+    .menu-bar:nth-child(1) {
+        transform: translateY(-6px);
+    }
+    
+    .menu-bar:nth-child(3) {
+        transform: translateY(6px);
+    }
+    
+    body.menu-open .mobile-menu-toggle {
+        background-color: var(--accent-primary);
+    }
+    
+    body.menu-open .mobile-menu-toggle .menu-bar {
+        background-color: white;
+    }
+    
+    body.menu-open .mobile-menu-toggle .menu-bar:nth-child(1) {
+        transform: rotate(45deg);
+    }
+    
+    body.menu-open .mobile-menu-toggle .menu-bar:nth-child(2) {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    
+    body.menu-open .mobile-menu-toggle .menu-bar:nth-child(3) {
+        transform: rotate(-45deg);
+    }
+    
+    .theme-toggle-container {
+        position: static;
+        top: auto;
+        right: auto;
+    }
+    
+    #theme-toggle {
+        width: 36px;
+        height: 36px;
+        box-shadow: none;
     }
     
     .sidebar-info {
-        display: none;
+        display: block;
+        padding: 20px;
+        margin-top: 60px;
     }
     
     .sidebar-footer {
-        display: none;
+        display: block;
+        padding: 15px 20px 30px;
     }
     
     .content {
         margin-left: 0;
+        margin-top: 70px;
         max-width: 100%;
-        padding: 20px;
+        padding: 15px;
+        height: auto;
     }
     
-    .header {
-        margin-bottom: 20px;
+    body.menu-open {
+        overflow: hidden;
     }
     
-    h1 {
-        font-size: 1.8rem;
+    .menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
     }
     
-    .password-card,
-    .tips-section {
-        padding: 20px;
+    .menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
     }
+    
+    .sidebar.expanded .sidebar-info h3,
+    .sidebar.expanded .sidebar-info p,
+    .sidebar.expanded .option-item,
+    .sidebar.expanded .sidebar-footer {
+        animation: slideInRight 0.3s forwards;
+        opacity: 0;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .sidebar.expanded .sidebar-info h3 { animation-delay: 0.1s; }
+    .sidebar.expanded .sidebar-info p { animation-delay: 0.2s; }
+    .sidebar.expanded .option-item:nth-child(1) { animation-delay: 0.3s; }
+    .sidebar.expanded .option-item:nth-child(2) { animation-delay: 0.4s; }
+    .sidebar.expanded .option-item:nth-child(3) { animation-delay: 0.5s; }
+    .sidebar.expanded .option-item:nth-child(4) { animation-delay: 0.6s; }
+    .sidebar.expanded .option-item:nth-child(5) { animation-delay: 0.7s; }
+    .sidebar.expanded .sidebar-footer { animation-delay: 0.8s; }
 }
 
 @media (max-width: 480px) {
     .content {
-        padding: 15px;
+        padding: 15px 10px;
+    }
+    
+    .theme-toggle-container {
+        top: 10px;
+        right: 10px;
     }
     
     h1 {
@@ -573,16 +822,94 @@ input:checked + .switch-slider:before {
         font-size: 0.9rem;
     }
     
+    .password-container {
+        flex-direction: column;
+    }
+    
     #password {
+        font-size: 16px;
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--border-color);
+        width: 100%;
+        text-align: center;
+    }
+    
+    .password-actions {
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        margin: 0;
+        padding: 5px;
+    }
+    
+    .icon-btn {
+        padding: 12px;
+    }
+    
+    .icon-btn i {
+        font-size: 22px;
+    }
+    
+    .primary-btn {
+        padding: 14px 20px;
+        font-size: 16px;
+        height: 50px;
+    }
+    
+    .options {
+        gap: 20px;
+    }
+    
+    .option-item {
+        margin-bottom: 10px;
+    }
+    
+    .switch {
+        width: 46px;
+        height: 24px;
+    }
+    
+    .switch-slider:before {
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+    }
+    
+    input:checked + .switch-slider:before {
+        transform: translateX(22px);
+    }
+    
+    .switch-label {
         font-size: 16px;
     }
     
-    .password-card {
-        padding: 15px;
+    .strength-segment {
+        height: 8px;
     }
     
+    .toast {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        width: calc(100% - 20px);
+        justify-content: center;
+        padding: 14px;
+    }
+}
+
+@media (max-width: 350px) {
+    h1 {
+        font-size: 1.3rem;
+    }
+    
+    .password-card,
     .tips-section {
-        padding: 15px;
+        padding: 12px;
+    }
+    
+    #password {
+        font-size: 14px;
     }
 }
 
@@ -596,25 +923,47 @@ input:checked + .switch-slider:before {
     animation: pulse 2s infinite;
 }
 
-@media (max-width: 768px) {
+@media (max-height: 500px) and (orientation: landscape) {
     .sidebar {
-        max-height: 80px;
-        overflow: hidden;
+        max-height: 60px;
     }
     
-    .sidebar.expanded {
-        max-height: 100vh;
+    .content {
+        padding-top: 10px;
     }
     
-    .sidebar.expanded .sidebar-info {
-        display: block;
+    h1 {
+        margin-bottom: 5px;
     }
     
-    .sidebar.expanded .sidebar-footer {
-        display: block;
+    .password-card {
+        margin-bottom: 20px;
     }
     
-    .logo-container {
-        cursor: pointer;
+    .theme-toggle-container {
+        top: 5px;
+        right: 5px;
     }
+    
+    #theme-toggle {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .tips-section {
+        padding: 15px;
+    }
+    
+    .tips-section li {
+        margin-bottom: 4px;
+    }
+}
+
+.app-container {
+    height: 100vh;
+    height: -webkit-fill-available;
+}
+
+html {
+    height: -webkit-fill-available;
 }
